@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>StoryAI</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    button {
+      background: #111;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    #output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>StoryAI</h1>
+
+  <p>ジャンル</p>
+  <select id="genre">
+    <option>恋愛</option>
+    <option>ホラー</option>
+    <option>感動</option>
+    <option>ビジネス</option>
+    <option>コメディ</option>
+  </select>
+
+  <p>長さ</p>
+  <select id="time">
+    <option>15秒</option>
+    <option>30秒</option>
+    <option>60秒</option>
+  </select>
+
+  <button onclick="generate()">台本を生成</button>
+
+  <div id="output">ここに台本が表示されます</div>
+
+  <script>
+    async function generate() {
+
+      const genre = document.getElementById("genre").value;
+      const time = document.getElementById("time").value;
+
+      const prompt = `
+あなたはプロの動画シナリオライターです。
+
+ジャンル：${genre}
+時間：${time}
+
+この条件で、YouTube・TikTok向けのショート動画台本を作ってください。
+
+必ず以下の形式で書いてください：
+・0秒〜
+・3秒〜
+・10秒〜
+・ラスト（オチ）
+      `;
+
+      document.getElementById("output").innerText = "生成中...";
+
+      try {
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: prompt
+          })
+        });
+
+        const data = await response.json();
+
+document.getElementById("output").innerText =
+  JSON.stringify(data, null, 2);
+
+      } catch (error) {
+        document.getElementById("output").innerText =
+          "通信エラーが発生しました";
+        console.error(error);
+      }
+    }
+  </script>
+
+</body>
+</html>
